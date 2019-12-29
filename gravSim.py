@@ -47,15 +47,15 @@ def create():
     pygame.display.update()
     ready = input("Confirm [y/N]: ")
     if ready == "" or ready.lower() == "y" or ready.lower == "yes":
-        return Planet.planet(center, mass, radius, [theta, speed])
+        return Planet.planet(center, mass, radius, [speed * math.cos(math.radians(theta)), speed * math.sin(math.radians(theta))])
     return None
 
 
-entities = []
+bodies = []
 
 # Temporary
-entities.append(Planet.planet([50, 750], 20, 30, [0, 40]))
-entities.append(Planet.planet([750, 50], 20, 30, [180, 40]))
+bodies.append(Planet.planet([50, 550], 20, 30, [20, 14]))
+bodies.append(Planet.planet([750, 250], 200000, 30, [-30, -8]))
 
 game_exit = False
 while not game_exit:
@@ -65,12 +65,13 @@ while not game_exit:
     if pygame.mouse.get_pressed()[0] == 1:
         new_planet = create()
         if new_planet:
-            entities.append(new_planet)
+            bodies.append(new_planet)
 
     gameDisplay.fill(DEEP_BLUE)
-    for entity in entities:
-        entity.travel()
-        entity.draw()
+    for body in bodies:
+        body.calculate_force(bodies)
+        body.travel()
+        body.draw()
     pygame.display.update()
     clock.tick(FPS)
 
