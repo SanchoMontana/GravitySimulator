@@ -50,12 +50,15 @@ def create():
         return Planet.planet(center, mass, radius, [speed * math.cos(math.radians(theta)), speed * math.sin(math.radians(theta))])
     return None
 
-
 bodies = []
 
 # Temporary
-bodies.append(Planet.planet([50, 550], 20, 30, [20, 14]))
-bodies.append(Planet.planet([750, 250], 200000, 30, [-30, -8]))
+bodies.append(Planet.planet([400, 400], 1000, 50, [0, 0]))
+bodies.append(Planet.planet([500, 400], 10, 20, [0, 10]))
+#bodies.append(Planet.planet([300, 400], 10, 20, [0, -10]))
+#bodies.append(Planet.planet([400, 300], 10, 20, [10, 0]))
+#bodies.append(Planet.planet([400, 500], 10, 20, [-10, 0]))
+#bodies.append(Planet.planet([400, 700], 3, 10, [5, 0]))
 
 game_exit = False
 while not game_exit:
