@@ -1,9 +1,8 @@
 from constants import *
-import random
 import math
 
 
-class planet:
+class Planet:
     def __init__(self, center, mass, radius, velocity, fixed=False):
         self.center = center
         self.mass = mass
@@ -14,9 +13,9 @@ class planet:
 
     def travel(self):
         if not self.fixed:
-            acceleration = [0, 0]
             acceleration = [self.force[0] / self.mass, self.force[1] / self.mass]
-            self.velocity = [self.velocity[0] + acceleration[0], self.velocity[1] + acceleration[1]]
+            for i in range(2):
+                self.velocity[i] += acceleration[i]
             self.center[0] += self.velocity[0] / 10
             self.center[1] += self.velocity[1] / 10
 
@@ -31,6 +30,23 @@ class planet:
                     theta *= -1
                 self.force[0] += resultant_force * math.cos(theta)
                 self.force[1] += resultant_force * math.sin(theta)
+
+    def test_collision(self, bodies):
+        for body in bodies:
+            if body != self:
+                distance = math.sqrt((self.center[0] - body.center[0]) ** 2 + (self.center[1] - body.center[1]) ** 2)
+                if distance < COLLISION_DISTANCE:
+                    # Calculate new velocity
+                    body.velocity[0] = (self.mass * self.velocity[0] + body.mass * body.velocity[0]) / (
+                            body.mass + self.mass)
+                    body.velocity[1] = (self.mass * self.velocity[1] + body.mass * body.velocity[1]) / (
+                            body.mass + self.mass)
+                    # Calculate new mass
+                    body.mass += self.mass
+                    # Calculate new radius
+                    body.radius = int(math.sqrt((math.pi * body.radius ** 2 + math.pi * self.radius ** 2) / math.pi))
+                    del self
+                    return True
 
     def draw(self):
         speed = math.sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2)
@@ -50,10 +66,14 @@ class planet:
                 pygame.draw.polygon(gameDisplay, RED,
                                     [(self.center[0] + self.velocity[0] * math.log10(speed),
                                       self.center[1] + self.velocity[1] * math.log10(speed)),
-                                     (self.center[0] + self.velocity[0] * math.log10(speed) + math.cos(theta - math.radians(160)) * 6,
-                                      self.center[1] + self.velocity[1] * math.log10(speed) + math.sin(theta - math.radians(160)) * 6),
-                                     (self.center[0] + self.velocity[0] * math.log10(speed) + math.cos(theta + math.radians(160)) * 6,
-                                      self.center[1] + self.velocity[1] * math.log10(speed) + math.sin(theta + math.radians(160)) * 6)])
+                                     (self.center[0] + self.velocity[0] * math.log10(speed) + math.cos(
+                                         theta - math.radians(160)) * 6,
+                                      self.center[1] + self.velocity[1] * math.log10(speed) + math.sin(
+                                          theta - math.radians(160)) * 6),
+                                     (self.center[0] + self.velocity[0] * math.log10(speed) + math.cos(
+                                         theta + math.radians(160)) * 6,
+                                      self.center[1] + self.velocity[1] * math.log10(speed) + math.sin(
+                                          theta + math.radians(160)) * 6)])
 
         total_force = math.sqrt(self.force[0] ** 2 + self.force[1] ** 2)
         if self.force[0] or self.force[1]:
@@ -67,11 +87,12 @@ class planet:
                 pygame.draw.polygon(gameDisplay, BLUE,
                                     [(self.center[0] + self.force[0] * math.log10(total_force),
                                       self.center[1] + self.force[1] * math.log10(total_force)),
-                                     (self.center[0] + self.force[0] * math.log10(total_force) + math.cos(theta - math.radians(160)) * 6,
-                                      self.center[1] + self.force[1] * math.log10(total_force) + math.sin(theta - math.radians(160)) * 6),
-                                     (self.center[0] + self.force[0] * math.log10(total_force) + math.cos(theta + math.radians(160)) * 6,
-                                      self.center[1] + self.force[1] * math.log10(total_force) + math.sin(theta + math.radians(160)) * 6)])
-
-
+                                     (self.center[0] + self.force[0] * math.log10(total_force) + math.cos(
+                                         theta - math.radians(160)) * 6,
+                                      self.center[1] + self.force[1] * math.log10(total_force) + math.sin(
+                                          theta - math.radians(160)) * 6),
+                                     (self.center[0] + self.force[0] * math.log10(total_force) + math.cos(
+                                         theta + math.radians(160)) * 6,
+                                      self.center[1] + self.force[1] * math.log10(total_force) + math.sin(
+                                          theta + math.radians(160)) * 6)])
         pygame.draw.circle(gameDisplay, GREEN, temp_center, 2)
-

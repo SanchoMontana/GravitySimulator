@@ -12,6 +12,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 G = 6.67E-11
+COLLISION_DISTANCE = 3
 
 pygame.init()
 pygame.mouse.set_visible(True)

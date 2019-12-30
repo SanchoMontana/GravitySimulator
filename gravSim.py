@@ -47,19 +47,14 @@ def create():
     pygame.display.update()
     ready = input("Confirm [y/N]: ")
     if ready == "" or ready.lower() == "y" or ready.lower == "yes":
-        return Planet.planet(center, mass, radius, [speed * math.cos(math.radians(theta)), speed * math.sin(math.radians(theta))])
+        return Planet.Planet(center, mass, radius,
+                             [speed * math.cos(math.radians(theta)), speed * math.sin(math.radians(theta))])
     return None
 
-bodies = []
 
-# Temporary
-bodies.append(Planet.planet([400, 400], 1000, 50, [0, -5]))
-bodies.append(Planet.planet([570, 400], 1000, 20, [0, 5]))
-bodies.append(Planet.planet([300, 400], 100, 20, [0, 10]))
-#bodies.append(Planet.planet([400, 300], 10, 20, [10, 0]))
-#bodies.append(Planet.planet([400, 500], 10, 20, [-10, 0]))
-#bodies.append(Planet.planet([400, 700], 3, 10, [5, 0]))
-
+bodies = [Planet.Planet([600, 400], 1000, 80, [-5, -1]), Planet.Planet([400, 400], 100, 20, [5, 1]),
+          Planet.Planet([300, 400], 100, 60, [2, 6]), Planet.Planet([400, 300], 120, 10, [5, 3]),
+          Planet.Planet([400, 500], 10, 20, [0, -6]), Planet.Planet([400, 700], 3, 10, [0, 0])]
 game_exit = False
 while not game_exit:
     for event in pygame.event.get():
@@ -73,9 +68,10 @@ while not game_exit:
     gameDisplay.fill(BLACK)
     for body in bodies:
         body.calculate_force(bodies)
+    for body in bodies:
         body.travel()
+        if body.test_collision(bodies):
+            bodies.remove(body)
         body.draw()
     pygame.display.update()
     clock.tick(FPS)
-
-
