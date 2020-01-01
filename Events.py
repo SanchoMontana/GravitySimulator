@@ -3,11 +3,6 @@ import math
 import Planet
 
 
-def check_quit(event):
-    if event.type == pygame.QUIT:
-        quit()
-
-
 def create_planet():
     center = [None, None]
     center[0] = pygame.mouse.get_pos()[0] - DISPLAY_WIDTH / 2

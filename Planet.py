@@ -1,7 +1,7 @@
 from constants import *
 import math
 import random
-
+import viewingTools
 
 class Planet:
     def __init__(self, center, mass, radius, velocity, fixed=False):
@@ -9,7 +9,7 @@ class Planet:
         self.drawn_center = self.center
         self.mass = mass
         self.radius = radius
-        self.drawn_radius = radius * dilation_index
+        self.drawn_radius = radius * viewingTools.dilation_index
         self.velocity = velocity
         self.fixed = fixed
         self.force = [0, 0]
