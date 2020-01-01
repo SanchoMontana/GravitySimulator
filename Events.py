@@ -10,8 +10,8 @@ def check_quit(event):
 
 def create_planet():
     center = [None, None]
-    center[0] = pygame.mouse.get_pos()[0]
-    center[1] = pygame.mouse.get_pos()[1]
+    center[0] = pygame.mouse.get_pos()[0] - DISPLAY_WIDTH / 2
+    center[1] = pygame.mouse.get_pos()[1] - DISPLAY_HEIGHT / 2
     pygame.draw.circle(gameDisplay, RED, center, 3)
     pygame.display.update()
     mass = int(input("Mass (kg): "))

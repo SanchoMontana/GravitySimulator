@@ -9,20 +9,26 @@ class Planet:
         self.drawn_center = self.center
         self.mass = mass
         self.radius = radius
+        self.drawn_radius = radius * dilation_index
         self.velocity = velocity
         self.fixed = fixed
         self.force = [0, 0]
         self.color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.collect_trail = True
         self.trail = []
+        self.drawn_trail = []
 
-    def draw_trail(self):
-        if self.collect_trail:
-            point = (int(self.center[0]), int(self.center[1]))
-            if not self.trail or self.trail[-1] != point:
-                self.trail.append(point)
-            for i in self.trail:
-                gameDisplay.set_at(i, self.color)
+    def draw_trail(self, translation, translation_old, dilation_index, dilation_index_old):
+        # if dilation_index changes
+        if not self.trail or self.trail[-1] != self.drawn_center:
+            self.trail.append((self.drawn_center[0], self.drawn_center[1]))
+            self.drawn_trail.append((self.drawn_center[0], self.drawn_center[1]))
+            self.drawn_trail[-1] = (DISPLAY_WIDTH / 2 + (self.drawn_trail[-1][0] - DISPLAY_WIDTH / 2) * dilation_index, DISPLAY_HEIGHT / 2 + (self.drawn_trail[-1][1] - DISPLAY_HEIGHT / 2) * dilation_index)
+            #self.drawn_trail.append((DISPLAY_WIDTH / 2 + (self.trail[-1][0] - DISPLAY_WIDTH / 2) * dilation_index, DISPLAY_HEIGHT / 2 + (self.trail[-1][1] - DISPLAY_HEIGHT / 2)))
+        if dilation_index != dilation_index_old:
+            self.drawn_trail = [(DISPLAY_WIDTH / 2 + (i[0] - DISPLAY_WIDTH / 2) * dilation_index, DISPLAY_HEIGHT / 2 + (i[1] - DISPLAY_HEIGHT / 2) * dilation_index) for i in self.trail]
+        for i in self.drawn_trail:
+            gameDisplay.set_at((int(i[0]), int(i[1])), self.color)
 
     def travel(self):
         if not self.fixed:
@@ -62,62 +68,58 @@ class Planet:
                     del self
                     return True
 
-    
-    def draw(self, dilation_index):
+    def translate(self, translation):
+        self.drawn_center = [self.center[0] + translation[0], self.center[1] + translation[1]]
+
+    def dilate(self, dilation_index):
+        distance_from_center = [self.drawn_center[0] - DISPLAY_WIDTH / 2, self.drawn_center[1] - DISPLAY_HEIGHT / 2]
+        self.drawn_center = [int(DISPLAY_WIDTH / 2 + distance_from_center[0] * dilation_index), int(DISPLAY_HEIGHT / 2 + distance_from_center[1] * dilation_index)]
+        self.drawn_radius = int(self.radius * dilation_index)
+
+    def draw(self):
         speed = math.sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2)
-        drawn_center = [self.center[0] + translation[0], self.center[1] + translation[1]]
-        distance_from_center = [drawn_center[0] - DISPLAY_WIDTH / 2, drawn_center[1] - DISPLAY_HEIGHT / 2]
-        #drawn_center[0] = int(drawn_center[0] + distance_from_center[0] * dilation_index)
-        #drawn_center[1] = int(drawn_center[1] + distance_from_center[1] * dilation_index)
-
-        drawn_center[0] = int(DISPLAY_WIDTH / 2 + distance_from_center[0] * dilation_index)
-        drawn_center[1] = int(DISPLAY_HEIGHT / 2 + distance_from_center[1] * dilation_index)
-
-        drawn_radius = int(self.radius * dilation_index)
-
-
-        pygame.draw.circle(gameDisplay, WHITE, drawn_center, drawn_radius, 1)
+        pygame.draw.circle(gameDisplay, WHITE, self.drawn_center, self.drawn_radius, 1)
         if speed:
             theta = math.acos(self.velocity[0]/speed)
-            if drawn_center[1] > drawn_center[1] + self.velocity[1]:
+            if self.drawn_center[1] > self.drawn_center[1] + self.velocity[1]:
                 theta *= -1
-            pygame.draw.line(gameDisplay, WHITE, drawn_center,
-                             [drawn_center[0] + self.velocity[0] * drawn_radius / speed,
-                              drawn_center[1] + self.velocity[1] * drawn_radius / speed])
-            pygame.draw.line(gameDisplay, RED, drawn_center,
-                             [drawn_center[0] + self.velocity[0] * math.log10(speed),
-                              drawn_center[1] + self.velocity[1] * math.log10(speed)])
+            pygame.draw.line(gameDisplay, WHITE, self.drawn_center,
+                             [self.drawn_center[0] + self.velocity[0] * self.drawn_radius / speed,
+                              self.drawn_center[1] + self.velocity[1] * self.drawn_radius / speed])
+            pygame.draw.line(gameDisplay, RED, self.drawn_center,
+                             [self.drawn_center[0] + self.velocity[0] * math.log10(speed),
+                              self.drawn_center[1] + self.velocity[1] * math.log10(speed)])
             if math.log10(speed) >= 1.2:
                 pygame.draw.polygon(gameDisplay, RED,
-                                    [(drawn_center[0] + self.velocity[0] * math.log10(speed),
-                                      drawn_center[1] + self.velocity[1] * math.log10(speed)),
-                                     (drawn_center[0] + self.velocity[0] * math.log10(speed) + math.cos(
+                                    [(self.drawn_center[0] + self.velocity[0] * math.log10(speed),
+                                      self.drawn_center[1] + self.velocity[1] * math.log10(speed)),
+                                     (self.drawn_center[0] + self.velocity[0] * math.log10(speed) + math.cos(
                                          theta - math.radians(160)) * 6,
-                                      drawn_center[1] + self.velocity[1] * math.log10(speed) + math.sin(
+                                      self.drawn_center[1] + self.velocity[1] * math.log10(speed) + math.sin(
                                           theta - math.radians(160)) * 6),
-                                     (drawn_center[0] + self.velocity[0] * math.log10(speed) + math.cos(
+                                     (self.drawn_center[0] + self.velocity[0] * math.log10(speed) + math.cos(
                                          theta + math.radians(160)) * 6,
-                                      drawn_center[1] + self.velocity[1] * math.log10(speed) + math.sin(
+                                      self.drawn_center[1] + self.velocity[1] * math.log10(speed) + math.sin(
                                           theta + math.radians(160)) * 6)])
 
         total_force = math.sqrt(self.force[0] ** 2 + self.force[1] ** 2)
         if self.force[0] or self.force[1]:
             theta = math.acos(self.force[0] / total_force)
-            if drawn_center[1] > drawn_center[1] + self.force[1]:
+            if self.drawn_center[1] > self.drawn_center[1] + self.force[1]:
                 theta *= -1
-            pygame.draw.line(gameDisplay, BLUE, drawn_center,
-                             [drawn_center[0] + self.force[0] * math.log10(total_force),
-                              drawn_center[1] + self.force[1] * math.log10(total_force)])
+            pygame.draw.line(gameDisplay, BLUE, self.drawn_center,
+                             [self.drawn_center[0] + self.force[0] * math.log10(total_force),
+                              self.drawn_center[1] + self.force[1] * math.log10(total_force)])
             if math.log10(total_force) >= 1.2:
                 pygame.draw.polygon(gameDisplay, BLUE,
-                                    [(drawn_center[0] + self.force[0] * math.log10(total_force),
-                                      drawn_center[1] + self.force[1] * math.log10(total_force)),
-                                     (drawn_center[0] + self.force[0] * math.log10(total_force) + math.cos(
+                                    [(self.drawn_center[0] + self.force[0] * math.log10(total_force),
+                                      self.drawn_center[1] + self.force[1] * math.log10(total_force)),
+                                     (self.drawn_center[0] + self.force[0] * math.log10(total_force) + math.cos(
                                          theta - math.radians(160)) * 6,
-                                      drawn_center[1] + self.force[1] * math.log10(total_force) + math.sin(
+                                      self.drawn_center[1] + self.force[1] * math.log10(total_force) + math.sin(
                                           theta - math.radians(160)) * 6),
-                                     (drawn_center[0] + self.force[0] * math.log10(total_force) + math.cos(
+                                     (self.drawn_center[0] + self.force[0] * math.log10(total_force) + math.cos(
                                          theta + math.radians(160)) * 6,
-                                      drawn_center[1] + self.force[1] * math.log10(total_force) + math.sin(
+                                      self.drawn_center[1] + self.force[1] * math.log10(total_force) + math.sin(
                                           theta + math.radians(160)) * 6)])
-        pygame.draw.circle(gameDisplay, GREEN, drawn_center, 2)
+        pygame.draw.circle(gameDisplay, GREEN, self.drawn_center, 2)

@@ -2,7 +2,7 @@ import pygame
 
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 800
-FPS = 50
+FPS = 100
 
 DEEP_BLUE = (10, 10, 30)
 BLUE = (0, 0, 255)
@@ -13,11 +13,13 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 G = 6.67E-11
 COLLISION_DISTANCE = 3
+translation_old = [0, 0]
 translation = [0, 0]
 delta_translation = [0, 0]
 DELTA_DILATION = 0.05
 dilation_index = 1
-delta_dilation_index = 0
+dilation_index_old = 1
+delta_dilation_iterator = 0
 dilation_iterator = 0
 ctrl = 0
 
