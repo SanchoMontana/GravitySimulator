@@ -13,15 +13,7 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 G = 6.67E-11
 COLLISION_DISTANCE = 3
-translation_old = [0, 0]
-translation = [0, 0]
-delta_translation = [0, 0]
 DELTA_DILATION = 0.05
-dilation_index = 1
-dilation_index_old = 1
-delta_dilation_iterator = 0
-dilation_iterator = 0
-ctrl = 0
 
 pygame.init()
 pygame.mouse.set_visible(True)
