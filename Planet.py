@@ -3,13 +3,14 @@ import math
 import random
 import viewingTools
 
+
 class Planet:
     def __init__(self, center, mass, radius, velocity, fixed=False):
         self.center = [center[0] + DISPLAY_WIDTH / 2, center[1] + DISPLAY_HEIGHT / 2]
         self.drawn_center = self.center
         self.mass = mass
         self.radius = radius
-        self.drawn_radius = radius * viewingTools.dilation_index
+        self.drawn_radius = radius * viewingTools.dilation
         self.velocity = velocity
         self.fixed = fixed
         self.force = [0, 0]
@@ -18,15 +19,28 @@ class Planet:
         self.trail = []
         self.drawn_trail = []
 
-    def draw_trail(self, translation, translation_old, dilation_index, dilation_index_old):
-        # if dilation_index changes
-        if not self.trail or self.trail[-1] != self.drawn_center:
-            self.trail.append((self.drawn_center[0], self.drawn_center[1]))
-            self.drawn_trail.append((self.drawn_center[0], self.drawn_center[1]))
-            self.drawn_trail[-1] = (DISPLAY_WIDTH / 2 + (self.drawn_trail[-1][0] - DISPLAY_WIDTH / 2) * dilation_index, DISPLAY_HEIGHT / 2 + (self.drawn_trail[-1][1] - DISPLAY_HEIGHT / 2) * dilation_index)
-            #self.drawn_trail.append((DISPLAY_WIDTH / 2 + (self.trail[-1][0] - DISPLAY_WIDTH / 2) * dilation_index, DISPLAY_HEIGHT / 2 + (self.trail[-1][1] - DISPLAY_HEIGHT / 2)))
-        if dilation_index != dilation_index_old:
-            self.drawn_trail = [(DISPLAY_WIDTH / 2 + (i[0] - DISPLAY_WIDTH / 2) * dilation_index, DISPLAY_HEIGHT / 2 + (i[1] - DISPLAY_HEIGHT / 2) * dilation_index) for i in self.trail]
+    def draw_trail(self):
+        # Do not append to self.trail if that exact point already exists.
+        if viewingTools.trail_toggle:
+            if not self.trail or self.trail[-1] != self.drawn_center:
+                self.trail.append((self.drawn_center[0], self.drawn_center[1]))
+                self.drawn_trail.append((self.drawn_center[0], self.drawn_center[1]))
+                self.drawn_trail[-1] = (
+                    DISPLAY_WIDTH / 2 + (self.drawn_trail[-1][0] - DISPLAY_WIDTH / 2) * viewingTools.dilation,
+                    DISPLAY_HEIGHT / 2 + (self.drawn_trail[-1][1] - DISPLAY_HEIGHT / 2) * viewingTools.dilation)
+
+        # If trail_toggle is False
+        else:
+            if self.trail:
+                self.trail = []
+                self.drawn_trail = []
+
+        # if dilation changes
+        if viewingTools.dilation != viewingTools.dilation_old:
+            self.drawn_trail = [(DISPLAY_WIDTH / 2 + (i[0] - DISPLAY_WIDTH / 2) * viewingTools.dilation,
+                                 DISPLAY_HEIGHT / 2 + (i[1] - DISPLAY_HEIGHT / 2) * viewingTools.dilation) for i in
+                                self.trail]
+        # Draw trail
         for i in self.drawn_trail:
             gameDisplay.set_at((int(i[0]), int(i[1])), self.color)
 
@@ -68,19 +82,20 @@ class Planet:
                     del self
                     return True
 
-    def translate(self, translation):
-        self.drawn_center = [self.center[0] + translation[0], self.center[1] + translation[1]]
+    def translate(self):
+        self.drawn_center = [self.center[0] + viewingTools.translation[0], self.center[1] + viewingTools.translation[1]]
 
-    def dilate(self, dilation_index):
+    def dilate(self):
         distance_from_center = [self.drawn_center[0] - DISPLAY_WIDTH / 2, self.drawn_center[1] - DISPLAY_HEIGHT / 2]
-        self.drawn_center = [int(DISPLAY_WIDTH / 2 + distance_from_center[0] * dilation_index), int(DISPLAY_HEIGHT / 2 + distance_from_center[1] * dilation_index)]
-        self.drawn_radius = int(self.radius * dilation_index)
+        self.drawn_center = [int(DISPLAY_WIDTH / 2 + distance_from_center[0] * viewingTools.dilation),
+                             int(DISPLAY_HEIGHT / 2 + distance_from_center[1] * viewingTools.dilation)]
+        self.drawn_radius = int(self.radius * viewingTools.dilation)
 
     def draw(self):
         speed = math.sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2)
         pygame.draw.circle(gameDisplay, WHITE, self.drawn_center, self.drawn_radius, 1)
         if speed:
-            theta = math.acos(self.velocity[0]/speed)
+            theta = math.acos(self.velocity[0] / speed)
             if self.drawn_center[1] > self.drawn_center[1] + self.velocity[1]:
                 theta *= -1
             pygame.draw.line(gameDisplay, WHITE, self.drawn_center,
@@ -123,3 +138,54 @@ class Planet:
                                       self.drawn_center[1] + self.force[1] * math.log10(total_force) + math.sin(
                                           theta + math.radians(160)) * 6)])
         pygame.draw.circle(gameDisplay, GREEN, self.drawn_center, 2)
+
+
+"""
+def create_planet():
+    center = [None, None]
+    center[0] = pygame.mouse.get_pos()[0] - DISPLAY_WIDTH / 2
+    center[1] = pygame.mouse.get_pos()[1] - DISPLAY_HEIGHT / 2
+    pygame.draw.circle(gameDisplay, RED, center, 3)
+    pygame.display.update()
+    mass = int(input("Mass (kg): "))
+    radius = int(input("Radius (m): "))
+    pygame.draw.circle(gameDisplay, GRAY, center, radius, 1)
+    pygame.display.update()
+    theta = int(input("Theta (degrees): ")) - 90
+    pygame.draw.line(gameDisplay, GRAY, center,
+                     [center[0] + math.cos(math.radians(theta)) * radius,
+                      center[1] + math.sin(math.radians(theta)) * radius])
+    pygame.draw.polygon(gameDisplay, GRAY,
+                        [(center[0] + math.cos(math.radians(theta)) * radius,
+                          center[1] + math.sin(math.radians(theta)) * radius),
+                         (center[0] + math.cos(math.radians(theta)) * radius + math.cos(
+                             math.radians(theta - 160)) * 6,
+                          center[1] + math.sin(math.radians(theta)) * radius + math.sin(
+                              math.radians(theta - 160)) * 6),
+                         (center[0] + math.cos(math.radians(theta)) * radius + math.cos(
+                             math.radians(theta + 160)) * 6,
+                          center[1] + math.sin(math.radians(theta)) * radius + math.sin(
+                              math.radians(theta + 160)) * 6)])
+    pygame.display.update()
+    speed = int(input("Speed (m/s): "))
+    pygame.draw.line(gameDisplay, RED, center,
+                     [center[0] + math.cos(math.radians(theta)) * speed * 3,
+                      center[1] + math.sin(math.radians(theta)) * speed * 3])
+    pygame.draw.polygon(gameDisplay, RED,
+                        [(center[0] + math.cos(math.radians(theta)) * speed * 3,
+                          center[1] + math.sin(math.radians(theta)) * speed * 3),
+                         (center[0] + math.cos(math.radians(theta)) * speed * 3 + math.cos(
+                             math.radians(theta - 160)) * 6,
+                          center[1] + math.sin(math.radians(theta)) * speed * 3 + math.sin(
+                              math.radians(theta - 160)) * 6),
+                         (center[0] + math.cos(math.radians(theta)) * speed * 3 + math.cos(
+                             math.radians(theta + 160)) * 6,
+                          center[1] + math.sin(math.radians(theta)) * speed * 3 + math.sin(
+                              math.radians(theta + 160)) * 6)])
+    pygame.display.update()
+    ready = input("Confirm [y/N]: ")
+    if ready == "" or ready.lower() == "y" or ready.lower == "yes":
+        return Planet.Planet(center, mass, radius,
+                             [speed * math.cos(math.radians(theta)), speed * math.sin(math.radians(theta))])
+    return None
+"""
