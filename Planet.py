@@ -35,11 +35,20 @@ class Planet:
                 self.trail = []
                 self.drawn_trail = []
 
-        # if dilation changes
+        # If translation changes
+        if viewingTools.translation != viewingTools.translation_old:
+            self.drawn_trail = [(i[0] + viewingTools.delta_translation[0] * viewingTools.dilation,
+                                 i[1] + viewingTools.delta_translation[1] * viewingTools.dilation)
+                                for i in self.drawn_trail]
+            self.trail = [(i[0] + viewingTools.delta_translation[0] * viewingTools.dilation,
+                           i[1] + viewingTools.delta_translation[1] * viewingTools.dilation) for i in self.drawn_trail]
+
+        # If dilation changes
         if viewingTools.dilation != viewingTools.dilation_old:
             self.drawn_trail = [(DISPLAY_WIDTH / 2 + (i[0] - DISPLAY_WIDTH / 2) * viewingTools.dilation,
                                  DISPLAY_HEIGHT / 2 + (i[1] - DISPLAY_HEIGHT / 2) * viewingTools.dilation) for i in
                                 self.trail]
+
         # Draw trail
         for i in self.drawn_trail:
             gameDisplay.set_at((int(i[0]), int(i[1])), self.color)

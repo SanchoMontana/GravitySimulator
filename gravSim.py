@@ -5,8 +5,8 @@ import viewingTools
 bodies = [Planet.Planet([0, 0], 10000, 40, [0, 0]),
           Planet.Planet([200, 0], 100, 20, [0, -10]),
           Planet.Planet([-200, 0], 100, 20, [0, 10]),
-          Planet.Planet([0, 350], 50, 10, [-5, -5]),
-          Planet.Planet([0, -350], 50, 10, [5, 5])]
+          Planet.Planet([0, 350], 50, 10, [-5, -2]),
+          Planet.Planet([0, -350], 50, 10, [5, 2])]
 
 game_exit = False
 while not game_exit:

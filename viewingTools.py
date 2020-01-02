@@ -1,4 +1,3 @@
-import pygame
 from constants import *
 from operator import add
 from math import e
