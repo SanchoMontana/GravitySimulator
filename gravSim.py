@@ -15,35 +15,35 @@ def create():
     pygame.display.update()
     theta = int(input("Theta (degrees): ")) - 90
     pygame.draw.line(gameDisplay, GRAY, center,
-                     [center[0] + math.cos(math.radians(theta)) * radius,
-                      center[1] + math.sin(math.radians(theta)) * radius])
+                     [int(center[0] + math.cos(math.radians(theta)) * radius),
+                      int(center[1] + math.sin(math.radians(theta)) * radius)])
     pygame.draw.polygon(gameDisplay, GRAY,
-                        [(center[0] + math.cos(math.radians(theta)) * radius,
-                          center[1] + math.sin(math.radians(theta)) * radius),
-                         (center[0] + math.cos(math.radians(theta)) * radius + math.cos(
-                             math.radians(theta - 160)) * 6,
-                          center[1] + math.sin(math.radians(theta)) * radius + math.sin(
-                              math.radians(theta - 160)) * 6),
-                         (center[0] + math.cos(math.radians(theta)) * radius + math.cos(
-                             math.radians(theta + 160)) * 6,
-                          center[1] + math.sin(math.radians(theta)) * radius + math.sin(
-                              math.radians(theta + 160)) * 6)])
+                        [(int(center[0] + math.cos(math.radians(theta)) * radius),
+                          int(center[1] + math.sin(math.radians(theta)) * radius)),
+                         (int(center[0] + math.cos(math.radians(theta)) * radius + math.cos(
+                             math.radians(theta - 160)) * 6),
+                          int(center[1] + math.sin(math.radians(theta)) * radius + math.sin(
+                              math.radians(theta - 160)) * 6)),
+                         (int(center[0] + math.cos(math.radians(theta)) * radius + math.cos(
+                             math.radians(theta + 160)) * 6),
+                          int(center[1] + math.sin(math.radians(theta)) * radius + math.sin(
+                              math.radians(theta + 160)) * 6))])
     pygame.display.update()
     speed = int(input("Speed (m/s): "))
     pygame.draw.line(gameDisplay, RED, center,
-                     [center[0] + math.cos(math.radians(theta)) * speed * 3,
-                      center[1] + math.sin(math.radians(theta)) * speed * 3])
+                     [int(center[0] + math.cos(math.radians(theta)) * speed * 3),
+                      int(center[1] + math.sin(math.radians(theta)) * speed * 3)])
     pygame.draw.polygon(gameDisplay, RED,
-                        [(center[0] + math.cos(math.radians(theta)) * speed * 3,
-                          center[1] + math.sin(math.radians(theta)) * speed * 3),
-                         (center[0] + math.cos(math.radians(theta)) * speed * 3 + math.cos(
-                             math.radians(theta - 160)) * 6,
-                          center[1] + math.sin(math.radians(theta)) * speed * 3 + math.sin(
-                              math.radians(theta - 160)) * 6),
-                         (center[0] + math.cos(math.radians(theta)) * speed * 3 + math.cos(
-                             math.radians(theta + 160)) * 6,
-                          center[1] + math.sin(math.radians(theta)) * speed * 3 + math.sin(
-                              math.radians(theta + 160)) * 6)])
+                        [(int(center[0] + math.cos(math.radians(theta)) * speed * 3),
+                          int(center[1] + math.sin(math.radians(theta)) * speed * 3)),
+                         (int(center[0] + math.cos(math.radians(theta)) * speed * 3 + math.cos(
+                             math.radians(theta - 160)) * 6),
+                          int(center[1] + math.sin(math.radians(theta)) * speed * 3 + math.sin(
+                              math.radians(theta - 160)) * 6)),
+                         (int(center[0] + math.cos(math.radians(theta)) * speed * 3 + math.cos(
+                             math.radians(theta + 160)) * 6),
+                          int(center[1] + math.sin(math.radians(theta)) * speed * 3 + math.sin(
+                              math.radians(theta + 160)) * 6))])
     pygame.display.update()
     ready = input("Confirm [y/N]: ")
     if ready == "" or ready.lower() == "y" or ready.lower == "yes":
